@@ -2,11 +2,10 @@ import { Separator } from "@/components/ui/separator";
 import { TypographyH2 } from "@/components/ui/typography";
 import { createServerSupabaseClient } from "@/lib/server-utils";
 import { redirect } from "next/navigation";
-import AddSpeciesDialog from "./add-species-dialog";
-import { SortedSpecies } from "./sort-species";
 
 
-export default async function SpeciesList() {
+
+export default async function UsersList() {
   // Create supabase server component client and obtain user session from stored cookie
   const supabase = createServerSupabaseClient();
   const {
@@ -19,18 +18,19 @@ export default async function SpeciesList() {
   }
 
   // Obtain the ID of the currently signed-in user
-  const sessionId = session.user.id;
 
-  const { data: profiles } = await supabase.from("profiles").select("*").order("id", { ascending: false });
-  const { data: species } = await supabase.from("species").select("*").order("id", { ascending: false });
+  const { data: users } = await supabase.from("profiles").select("*").order("id", { ascending: false });
+
   return (
     <>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
-        <TypographyH2>Species List</TypographyH2>
-        <AddSpeciesDialog userId={sessionId} />
+        <TypographyH2>User List</TypographyH2>
       </div>
       <Separator className="my-4" />
-      {species && profiles ? <SortedSpecies id={sessionId} species={species} profiles={profiles}></SortedSpecies> : "none"}
+
+      <div className="justify-center">
+        {users?.map((users) => <h1 key={users.id}> {users.display_name}: {users.email} <br/> Bio: {users.biography} <br/><br/></h1>)}
+      </div>
     </>
   );
 }
